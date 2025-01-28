@@ -6,11 +6,13 @@ import com.example.demo.dto.EmployeeDto;
 import com.example.demo.exception.EmployeeNotFoundException;
 import com.example.demo.model.Employee;
 import com.example.demo.repository.EmployeeRepository;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.awt.image.RescaleOp;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService{
 
    @Autowired
@@ -25,9 +28,12 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Autowired
     private ModelMapper modelMapper;
+    private final WebClient webClient;
 
-    @Autowired
-    private RestTemplate restTemplate;
+//    @Autowired
+//    private RestTemplate restTemplate;
+
+
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         Employee employee = modelMapper.map(employeeDto, Employee.class);
@@ -45,9 +51,14 @@ public class EmployeeServiceImpl implements EmployeeService{
             throw new EmployeeNotFoundException("Employee Not exists buddy");
         }
 
-        ResponseEntity<DepartmentDto>responseEntity=restTemplate.getForEntity("http://localhost:8083/department/" + partyId, DepartmentDto.class);
-        DepartmentDto departmentDto=  responseEntity.getBody();
+//        ResponseEntity<DepartmentDto>responseEntity=restTemplate.getForEntity("http://localhost:8083/department/" + partyId, DepartmentDto.class);
+//        DepartmentDto departmentDto=  responseEntity.getBody();
 
+        DepartmentDto departmentDto =webClient.get()
+                .uri("http://localhost:8083/department/" + partyId)
+                .retrieve()
+                .bodyToMono(DepartmentDto.class)
+                .block();
        EmployeeDto employeeDto=modelMapper.map(existingEmp,EmployeeDto.class);
         APIDto apiDto = new APIDto();
         apiDto.setEmployeeDto(employeeDto);
