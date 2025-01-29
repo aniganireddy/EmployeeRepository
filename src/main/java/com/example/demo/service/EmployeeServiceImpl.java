@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.clients.APIClients;
 import com.example.demo.dto.APIDto;
 import com.example.demo.dto.DepartmentDto;
 import com.example.demo.dto.EmployeeDto;
@@ -28,7 +29,9 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Autowired
     private ModelMapper modelMapper;
-    private final WebClient webClient;
+//    private final WebClient webClient;
+    @Autowired
+    private APIClients apiClients;
 
 //    @Autowired
 //    private RestTemplate restTemplate;
@@ -54,11 +57,13 @@ public class EmployeeServiceImpl implements EmployeeService{
 //        ResponseEntity<DepartmentDto>responseEntity=restTemplate.getForEntity("http://localhost:8083/department/" + partyId, DepartmentDto.class);
 //        DepartmentDto departmentDto=  responseEntity.getBody();
 
-        DepartmentDto departmentDto =webClient.get()
-                .uri("http://localhost:8083/department/" + partyId)
-                .retrieve()
-                .bodyToMono(DepartmentDto.class)
-                .block();
+//        DepartmentDto departmentDto =webClient.get()
+//                .uri("http://localhost:8083/department/" + partyId)
+//                .retrieve()
+//                .bodyToMono(DepartmentDto.class)
+//                .block();
+
+        DepartmentDto departmentDto= apiClients.getDepartmentRecord(partyId);
        EmployeeDto employeeDto=modelMapper.map(existingEmp,EmployeeDto.class);
         APIDto apiDto = new APIDto();
         apiDto.setEmployeeDto(employeeDto);
